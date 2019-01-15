@@ -1,0 +1,90 @@
+Documentation for the automatic axiom independence checker by Dan McAloon & TJ Root
+
+The axiom independence checker system exists in six files, separated for
+ease of use for the programmer.  Any sentences that the programmer wishes to 
+"solve" (prove independence) using this system merely have to be passed in as a single
+post variable, separated by a carriage return and a newline (standard Windows
+line separators).  The axiom system independence checker handles all output.
+
+Function Definition by File:
+main_solver.php:
+No functions exist, this is a script file that accepts posted sentences inside the post
+variable "sentences".
+
+
+unique_vars.php:
+one function in file:
+get_vars()
+Takes an array of strings and counts the number of unique letters in those strings.
+
+
+translation_table_generator.php:
+Class file, 1 function.
+generate_translation_tables( $variables ):
+accepts a number of variables (letters, numbers, words, whatever) passed in as an array.
+The translation table generator returns an array of associative arrays.
+Each element in the return array is an associative array representing a possible
+permutation of the translation from the variables passed into this function, and the
+variables A-J.  For instance, if you passed in the array (P, Q, R), this function would
+return the array:
+(
+(P=>A, Q=>A, R=>A),
+(P=>A, Q=>A, R=>B),
+(P=>A, Q=>A, R=>C),
+(P=>A, Q=>B, R=>A),
+(P=>A, Q=>B, R=>B),
+(P=>A, Q=>B, R=>C),
+(P=>A, Q=>C, R=>A),
+(P=>A, Q=>C, R=>B),
+(P=>A, Q=>C, R=>C),
+(P=>B, Q=>A, R=>A),
+(P=>B, Q=>A, R=>B),
+(P=>B, Q=>A, R=>C),
+(P=>B, Q=>B, R=>A),
+(P=>B, Q=>B, R=>B),
+(P=>B, Q=>B, R=>C),
+(P=>B, Q=>C, R=>A),
+(P=>B, Q=>C, R=>B),
+(P=>B, Q=>C, R=>C),
+(P=>C, Q=>A, R=>A),
+(P=>C, Q=>A, R=>B),
+(P=>C, Q=>A, R=>C),
+(P=>C, Q=>B, R=>A),
+(P=>C, Q=>B, R=>B),
+(P=>C, Q=>B, R=>C),
+(P=>C, Q=>C, R=>A),
+(P=>C, Q=>C, R=>B),
+(P=>C, Q=>C, R=>C)
+)
+
+
+axiom_solver.php:
+public function __constuct( $max )
+$max is an integer representing the number of variables to use in the resolution tables.
+
+public function increment_arrays()
+increment the arrays representing the resolution tables once, returns false if we have reached the
+last iteration of the tables.
+
+public function check_implication()
+returns true if the current iteration of the tables performs implication properly, false if not.
+
+public function interpret( $operator, $val_a, $val_b = "" )
+accepts one or two values and an operator.  If the operator is "^" or "v", it looks up
+the value if that operation is performed on both val_a and val_b.  If the operator is
+"~", this returns NOT val_a.  Return type is a letter.
+
+public function test_print()
+prints out the current tables, HTML formatted into tables.
+
+
+axiom_table.php
+Struct file, represents a row in the axiom tables stored in axiom_solver.
+
+
+solve.php
+1 function in file that actually matters:
+evaluate_sentence( $sentence )
+when passed a properly formed FOL sentence, continually calls the interpret() function
+on axiom_solver.php on parts of the sentence, replacing the WFFs with their logical
+equivalences, until a single letter remains, then returns that letter.  
